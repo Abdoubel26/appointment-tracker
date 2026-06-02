@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { deleteAppointment } from "../../../../db/queries";
 
 
-const DELETE = async (req: Request) => {
+export const DELETE = async (req: Request) => {
 
     const { id } = await req.json();
 

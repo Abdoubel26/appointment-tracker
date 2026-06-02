@@ -31,7 +31,7 @@ export default function DashboardClient({ appointments: initialAppointments, use
   );
 
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
+    await fetch("/api/user/logout", { method: "POST" });
     router.push("/login");
   };
 
@@ -62,7 +62,6 @@ export default function DashboardClient({ appointments: initialAppointments, use
 
   return (
     <div className="min-h-screen bg-neutral-100 p-6">
-      {/* Header */}
       <div className="flex items-center justify-between mb-8 max-w-6xl mx-auto">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium text-lg">
@@ -76,7 +75,7 @@ export default function DashboardClient({ appointments: initialAppointments, use
 
         <button
           onClick={handleLogout}
-          className="px-5 py-2 text-sm border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition"
+          className="px-5 py-2 text-sm border cursor-pointer border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition"
         >
           Logout
         </button>
@@ -147,7 +146,6 @@ export default function DashboardClient({ appointments: initialAppointments, use
         )}
       </div>
 
-      {/* Modals */}
       {showAddModal && (
         <AddAppointment userId={user.id} onClose={() => setShowAddModal(false)} />
       )}

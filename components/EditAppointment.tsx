@@ -32,36 +32,38 @@ export default function EditAppointment({ appointment, onClose }: Props) {
   const [status, setStatus] = useState<"pending" | "held">(appointment.status);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  e.preventDefault();
+  setLoading(true);
+  setError("");
 
-    try {
-      const res = await fetch("/api/appointment/update", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: appointment.id,
-          title,
-          date: new Date(date),
-          client_name: client_name || null,
-          client_phone_number: client_phone_number || null,
-          description: description || null,
-          status,
-        }),
-      });
+  try {
+    const res = await fetch("/api/appointment/update", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: appointment.id,
+        title,
+        date,       
+        client_name: client_name || null,
+        client_phone_number: client_phone_number || null,
+        description: description || null,
+        status,
+      }),
+    });
 
-      if (!res.ok) throw new Error();
-
-      router.refresh();
-      onClose();
-    } catch {
-      setError("Failed to update appointment");
-    } finally {
-      setLoading(false);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.message || "Failed to update appointment");
     }
-  };
 
+    router.refresh();
+    onClose();
+  } catch (err: any) {
+    setError(err.message || "Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
       <div className="bg-white rounded-2xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
@@ -71,7 +73,7 @@ export default function EditAppointment({ appointment, onClose }: Props) {
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {/* Same fields as AddAppointment */}
+          
           <div>
             <label className="text-sm text-neutral-500">Title</label>
             <input value={title} onChange={e => setTitle(e.target.value)} required className="w-full px-3.5 py-2.5 text-sm border border-neutral-200 rounded-lg" />
