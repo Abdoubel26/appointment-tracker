@@ -1,35 +1,24 @@
-
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-type Appointment = {
-  id: string;
-  title: string;
-  date: Date | string;
-  client_name?: string | null;
-  client_phone_number?: string | null;
-  description?: string | null;
-  status: "pending" | "held";
-};
-
 type Props = {
-  appointment: Appointment;
-  onClose: () => void;
+  onClose: () => void
+  userId: string
 };
 
-export default function EditAppointment({ appointment, onClose }: Props) {
+export default function AddAppointment({ onClose, userId }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const [title, setTitle] = useState(appointment.title);
-  const [date, setDate] = useState(new Date(appointment.date).toISOString().slice(0, 16));
-  const [client_name, setClientName] = useState(appointment.client_name || "");
-  const [client_phone_number, setClientPhone] = useState(appointment.client_phone_number || "");
-  const [description, setDescription] = useState(appointment.description || "");
-  const [status, setStatus] = useState<"pending" | "held">(appointment.status);
+  const [title, setTitle] = useState("");
+  const [date, setDate] = useState("");
+  const [client_name, setClientName] = useState("");
+  const [client_phone_number, setClientPhone] = useState("");
+  const [description, setDescription] = useState("");
+  const [status, setStatus] = useState<"pending" | "held">("pending");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,26 +26,26 @@ export default function EditAppointment({ appointment, onClose }: Props) {
     setError("");
 
     try {
-      const res = await fetch("/api/appointment/update", {
-        method: "PUT",
+      const res = await fetch("/api/appointment/add", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id: appointment.id,
-          title,
-          date: new Date(date),
-          client_name: client_name || null,
-          client_phone_number: client_phone_number || null,
-          description: description || null,
-          status,
+            user_id: userId,
+            title,
+            date: new Date(date),
+            client_name: client_name || null,
+            client_phone_number: client_phone_number || null,
+            description: description || null,
+            status,
         }),
       });
 
-      if (!res.ok) throw new Error();
+    if (!res.ok) throw new Error("Failed to create appointment");
 
       router.refresh();
       onClose();
-    } catch {
-      setError("Failed to update appointment");
+    } catch (err) {
+      setError("Something went wrong. Please try again: " + err);
     } finally {
       setLoading(false);
     }
@@ -66,12 +55,11 @@ export default function EditAppointment({ appointment, onClose }: Props) {
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
       <div className="bg-white rounded-2xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
         <div className="flex justify-between items-center mb-5">
-          <h2 className="text-lg font-medium">Edit Appointment</h2>
-          <button onClick={onClose} className="text-xl text-neutral-400 hover:text-neutral-600">✕</button>
+          <h2 className="text-lg font-medium">New Appointment</h2>
+          <button onClick={onClose} className="text-xl cursor-pointer text-neutral-400 hover:text-neutral-600">✕</button>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {/* Same fields as AddAppointment */}
           <div>
             <label className="text-sm text-neutral-500">Title</label>
             <input value={title} onChange={e => setTitle(e.target.value)} required className="w-full px-3.5 py-2.5 text-sm border border-neutral-200 rounded-lg" />
@@ -108,8 +96,8 @@ export default function EditAppointment({ appointment, onClose }: Props) {
 
           {error && <p className="text-red-500 text-sm">{error}</p>}
 
-          <button type="submit" disabled={loading} className="py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium disabled:opacity-50">
-            {loading ? "Saving..." : "Save Changes"}
+          <button type="submit" disabled={loading} className="py-3 bg-blue-600  cursor-pointer hover:bg-blue-700 text-white rounded-xl font-medium disabled:opacity-50">
+            {loading ? "Creating..." : "Create Appointment"}
           </button>
         </form>
       </div>

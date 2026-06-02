@@ -15,3 +15,4 @@ type Appointment = {
     client_phone_number?: string,
     status: "pending" | "held"
 }
+

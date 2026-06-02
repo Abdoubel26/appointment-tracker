@@ -1,6 +1,6 @@
 "use client"
 import { useRouter } from "next/navigation";
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 type AuthState = "login" | "sign up"
 
@@ -20,9 +20,14 @@ function LoginPage() {
     const [password, setPassword] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
+    useEffect(() => {
+        setWarning({ show: false, message:""})
+    }, [authState])
+
 
     const handleSubmit = async (e: any) => {
         e.preventDefault()
+        setWarning({ show: false, message:""})
         setIsLoading(true)
         if(authState === "login"){
             const res = await fetch("/api/user/login", {
@@ -40,11 +45,12 @@ function LoginPage() {
                 case 401: 
                     setWarning({ show: true, message: "Wrong Email or Password"});
                     break;
+                case 500:
+                    setWarning({ show: true, message: "something went wrong"});
                 case 200:
                     router.push("/dashboard")
                     break;
             }
-            setIsLoading(false)
         }
         else if(authState === "sign up"){
             const res = await fetch("/api/user/signup", {
@@ -66,8 +72,8 @@ function LoginPage() {
                     router.push("/dashboard")
                     break;
             }
-            setIsLoading(false)
         }
+        setIsLoading(false)
     }
 
     return (

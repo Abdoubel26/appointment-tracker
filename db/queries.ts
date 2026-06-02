@@ -14,7 +14,7 @@ export const findUserByEmail = async (email: string) => {
 
 export const findUserById = async (id: string) => {
     const foundUser = await db.select().from(users).where(eq(users.id, id));
-    return foundUser;
+    return foundUser[0];
 };
 
 export const addAppointment = async (appointment: Appointment) => {

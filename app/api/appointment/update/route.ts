@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 
 
-const PUT = async (req: Request) =>  {
+export const PUT = async (req: Request) =>  {
 
     const appointment: Appointment = await req.json()
 
